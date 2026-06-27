@@ -1,0 +1,3 @@
+Webhook-triggered pipeline E2E marker for Pipeline Platform.
+
+This file exists only to create a small commit under the configured service path.
