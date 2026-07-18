@@ -1,0 +1,15 @@
+{
+  "name": "pipeline-e2e-demo-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "synth": "cdk synth -c environmentName=beta"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.200.0",
+    "constructs": "10.4.2"
+  },
+  "devDependencies": {
+    "aws-cdk": "2.1128.0"
+  }
+}

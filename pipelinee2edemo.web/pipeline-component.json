@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "2026-07-17",
+  "componentKey": "pipeline-e2e-demo-web",
+  "name": "pipeline-e2e-demo-web",
+  "type": "frontend_static",
+  "pluginId": "frontend-static",
+  "pluginVersion": "2.0.0",
+  "triggerPaths": [
+    "pipelinee2edemo.cdk"
+  ],
+  "build": {
+    "config": {
+      "command": "npm ci && npm run build",
+      "packageCommand": "npm ci && npm run build"
+    }
+  },
+  "deploymentTarget": {
+    "kind": "frontend-static",
+    "buildOutputPath": "dist",
+    "preserveObjects": [
+      "config.js"
+    ]
+  },
+  "environments": {
+    "beta": {
+      "outputBindings": {
+        "bucketName": {
+          "providerComponentKey": "pipeline-e2e-demo-cdk",
+          "stackName": "pipeline-e2e-demo-beta-web",
+          "outputName": "FrontendBucketName"
+        },
+        "cloudFrontDistributionId": {
+          "providerComponentKey": "pipeline-e2e-demo-cdk",
+          "stackName": "pipeline-e2e-demo-beta-web",
+          "outputName": "FrontendDistributionId"
+        }
+      }
+    },
+    "prod": {
+      "outputBindings": {
+        "bucketName": {
+          "providerComponentKey": "pipeline-e2e-demo-cdk",
+          "stackName": "pipeline-e2e-demo-prod-web",
+          "outputName": "FrontendBucketName"
+        },
+        "cloudFrontDistributionId": {
+          "providerComponentKey": "pipeline-e2e-demo-cdk",
+          "stackName": "pipeline-e2e-demo-prod-web",
+          "outputName": "FrontendDistributionId"
+        }
+      }
+    }
+  },
+  "test": {
+    "command": "test -s dist/index.html && test ! -e dist/config.js"
+  }
+}

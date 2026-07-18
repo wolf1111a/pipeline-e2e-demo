@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "2026-07-17",
+  "projectKey": "pipeline-e2e-demo",
+  "displayName": "Pipeline Platform Isolated E2E",
+  "github": {
+    "owner": "wolf1111a",
+    "repo": "pipeline-e2e-demo",
+    "defaultBranch": "main"
+  },
+  "awsDefaults": {
+    "accountId": "516703876684",
+    "region": "us-east-1"
+  },
+  "environments": {
+    "beta": {
+      "isProduction": false,
+      "clientUrl": "https://beta.pipeline-e2e-demo.example.com"
+    },
+    "prod": {
+      "isProduction": true,
+      "clientUrl": "https://pipeline-e2e-demo.example.com"
+    }
+  },
+  "environmentOrder": [
+    "beta",
+    "prod"
+  ],
+  "sharedConfig": {
+    "secretArn": "arn:aws:secretsmanager:us-east-1:516703876684:secret:pipeline-platform-e2e/config",
+    "projectPath": "pipeline-e2e-demo"
+  },
+  "stageApprovals": {
+    "build": {
+      "requiresApproval": false
+    },
+    "package": {
+      "requiresApproval": false
+    },
+    "deploy_beta": {
+      "requiresApproval": true,
+      "reason": "Isolated E2E verifies one approval for the beta deploy barrier."
+    },
+    "verify_beta": {
+      "requiresApproval": false
+    },
+    "deploy_prod": {
+      "requiresApproval": true,
+      "reason": "Isolated E2E verifies one approval for the production-style deploy barrier."
+    },
+    "verify_prod": {
+      "requiresApproval": false
+    }
+  }
+}
