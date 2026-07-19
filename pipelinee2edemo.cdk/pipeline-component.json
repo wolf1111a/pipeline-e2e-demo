@@ -18,12 +18,14 @@
     "beta": {
       "cdkContext": {
         "environmentName": "beta"
-      }
+      },
+      "seedCommand": "test -s cdk.json"
     },
     "prod": {
       "cdkContext": {
         "environmentName": "prod"
-      }
+      },
+      "seedCommand": "test -s cdk.json"
     }
   },
   "test": {

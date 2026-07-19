@@ -1,0 +1,9 @@
+{
+  "name": "pipeline-e2e-demo-lambda",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rm -f lambda.zip && zip -q lambda.zip index.js",
+    "test": "node -e \"require('./index.js').handler().then((result) => { if (result.statusCode !== 200) process.exit(1); })\""
+  }
+}

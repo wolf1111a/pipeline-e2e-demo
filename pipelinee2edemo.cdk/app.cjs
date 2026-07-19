@@ -2,6 +2,7 @@ const cdk = require("aws-cdk-lib");
 const cloudfront = require("aws-cdk-lib/aws-cloudfront");
 const origins = require("aws-cdk-lib/aws-cloudfront-origins");
 const iam = require("aws-cdk-lib/aws-iam");
+const lambda = require("aws-cdk-lib/aws-lambda");
 const s3 = require("aws-cdk-lib/aws-s3");
 const ssm = require("aws-cdk-lib/aws-ssm");
 const cr = require("aws-cdk-lib/custom-resources");
@@ -27,6 +28,23 @@ new ssm.StringParameter(coreStack, "StateParameter", {
 });
 new cdk.CfnOutput(coreStack, "StateParameterName", {
   value: `/pipeline-e2e-demo/${environmentName}/state`,
+});
+const lambdaArtifactBucket = s3.Bucket.fromBucketName(
+  coreStack,
+  "LambdaArtifactBucket",
+  `${prefix}-${region}-lambda-artifacts-${account}`,
+);
+const apiFunction = new lambda.Function(coreStack, "ApiFunction", {
+  code: lambda.Code.fromBucket(
+    lambdaArtifactBucket,
+    `${commitId}/lambda.zip`,
+  ),
+  functionName: `${prefix}-api`,
+  handler: "index.handler",
+  runtime: lambda.Runtime.NODEJS_22_X,
+});
+new cdk.CfnOutput(coreStack, "ApiFunctionName", {
+  value: apiFunction.functionName,
 });
 
 const webStack = new cdk.Stack(app, "PipelineE2EDemoWeb", {

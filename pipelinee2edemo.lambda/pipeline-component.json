@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "2026-07-17",
+  "componentKey": "pipeline-e2e-demo-lambda",
+  "name": "pipeline-e2e-demo-lambda",
+  "type": "lambda",
+  "pluginId": "aws-lambda",
+  "pluginVersion": "1.0.0",
+  "build": {
+    "config": {
+      "command": "npm run test",
+      "packageCommand": "npm run build"
+    }
+  },
+  "deploymentTarget": {
+    "kind": "aws-lambda",
+    "publishMode": "s3-artifact",
+    "artifactPath": "lambda.zip"
+  },
+  "environments": {
+    "beta": {
+      "artifactBucketName": "pipeline-e2e-demo-beta-us-east-1-lambda-artifacts-516703876684",
+      "artifactKeyTemplate": "{commitSha}/lambda.zip"
+    },
+    "prod": {
+      "artifactBucketName": "pipeline-e2e-demo-prod-us-east-1-lambda-artifacts-516703876684",
+      "artifactKeyTemplate": "{commitSha}/lambda.zip"
+    }
+  },
+  "test": {
+    "command": "test -s lambda.zip && unzip -tq lambda.zip"
+  }
+}
