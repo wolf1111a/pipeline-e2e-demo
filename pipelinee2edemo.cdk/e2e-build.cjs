@@ -39,7 +39,10 @@ function buildHoldEnabled() {
   }
 }
 
-if (marker?.kind === "latest-wins-held") {
+if (
+  marker?.kind === "latest-wins-held" ||
+  marker?.kind === "running-sibling-failure"
+) {
   const deadline = Date.now() + (15 * 60_000);
   while (buildHoldEnabled() && Date.now() < deadline) {
     Atomics.wait(
