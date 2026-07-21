@@ -1,31 +1,24 @@
 {
-  "schemaVersion": "2026-07-17",
+  "schemaVersion": "2026-standalone-stage-v1",
   "componentKey": "pipeline-e2e-demo-cdk",
   "name": "pipeline-e2e-demo-cdk",
   "type": "cdk_infra",
   "pluginId": "cdk-node",
   "pluginVersion": "2.0.0",
   "build": {
-    "config": {
-      "command": "node e2e-build.cjs && npm ci && npm run synth"
-    }
+    "command": "node e2e-build.cjs && npm ci && npm run synth",
+    "packageCommand": "node e2e-package.cjs && npm ci"
   },
-  "deploymentTarget": {
-    "kind": "cdk-node",
-    "appPath": "."
-  },
-  "environments": {
-    "beta": {
-      "cdkContext": {
-        "environmentName": "beta"
-      },
-      "seedCommand": "test -s cdk.json"
+  "deployment": {
+    "deploy": {
+      "kind": "cdk-node",
+      "appPath": "."
     },
-    "prod": {
-      "cdkContext": {
-        "environmentName": "prod"
-      },
-      "seedCommand": "test -s cdk.json"
+    "seed": {
+      "command": "test -s cdk.json"
+    },
+    "verify": {
+      "command": "test -s cdk.json"
     }
   },
   "test": {

@@ -3,17 +3,9 @@ const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 
 const markerPath = path.join(__dirname, "e2e-trigger.json");
-let marker;
+const marker = JSON.parse(fs.readFileSync(markerPath, "utf8"));
 
-try {
-  marker = JSON.parse(fs.readFileSync(markerPath, "utf8"));
-} catch (error) {
-  if (error.code !== "ENOENT") {
-    throw error;
-  }
-}
-
-function buildHoldEnabled() {
+function packageHoldEnabled() {
   const secretId = process.env.PIPELINE_SHARED_CONFIG_SECRET_ID;
   if (!secretId) {
     return false;
@@ -33,15 +25,18 @@ function buildHoldEnabled() {
       ],
       { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
     );
-    return JSON.parse(raw).shared?.beta?.["e2e-hold-build"] === "true";
+    return JSON.parse(raw).shared?.beta?.["e2e-hold-package"] === "true";
   } catch {
     return false;
   }
 }
 
-if (marker?.kind === "held-build" || marker?.kind === "build-failure") {
+if (
+  marker.kind === "package-edge-middle" ||
+  marker.kind === "package-edge-latest"
+) {
   const deadline = Date.now() + (15 * 60_000);
-  while (buildHoldEnabled() && Date.now() < deadline) {
+  while (packageHoldEnabled() && Date.now() < deadline) {
     Atomics.wait(
       new Int32Array(new SharedArrayBuffer(4)),
       0,

@@ -11,7 +11,7 @@ const markerPath = path.join(
 const marker = JSON.parse(fs.readFileSync(markerPath, "utf8"));
 
 if (
-  marker.kind === "running-sibling-failure" &&
+  marker.kind === "build-failure" &&
   process.env.PIPELINE_STAGE_ATTEMPT === "1"
 ) {
   Atomics.wait(

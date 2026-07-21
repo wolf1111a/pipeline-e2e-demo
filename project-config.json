@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2026-07-17",
+  "schemaVersion": "2026-standalone-stage-v1",
   "projectKey": "pipeline-e2e-demo",
   "displayName": "Pipeline Platform Isolated E2E",
   "github": {
@@ -11,44 +11,110 @@
     "accountId": "516703876684",
     "region": "us-east-1"
   },
-  "environments": {
-    "beta": {
-      "isProduction": false,
-      "clientUrl": "https://beta.pipeline-e2e-demo.example.com"
-    },
-    "prod": {
-      "isProduction": true,
-      "clientUrl": "https://pipeline-e2e-demo.example.com"
-    }
+  "sharedConfig": {
+    "secretArn": "arn:aws:secretsmanager:us-east-1:516703876684:secret:pipeline-platform-e2e/config",
+    "projectPath": "pipeline-e2e-demo"
   },
   "environmentOrder": [
     "beta",
     "prod"
   ],
-  "sharedConfig": {
-    "secretArn": "arn:aws:secretsmanager:us-east-1:516703876684:secret:pipeline-platform-e2e/config",
-    "projectPath": "pipeline-e2e-demo"
+  "environments": {
+    "beta": {
+      "isProduction": false,
+      "target": {},
+      "bindings": {
+        "WEB_BUCKET_NAME": {
+          "kind": "cdk-output",
+          "componentKey": "pipeline-e2e-demo-cdk",
+          "outputName": "FrontendBucketName"
+        },
+        "CLOUDFRONT_DISTRIBUTION_ID": {
+          "kind": "cdk-output",
+          "componentKey": "pipeline-e2e-demo-cdk",
+          "outputName": "FrontendDistributionId"
+        }
+      },
+      "secretBindings": {},
+      "deployment": {
+        "requiresApproval": true,
+        "approvalExpiresAfterSeconds": 60,
+        "timeoutSeconds": 3600,
+        "subStages": {
+          "deploy": {
+            "timeoutSeconds": 1800
+          },
+          "seed": {
+            "timeoutSeconds": 300
+          },
+          "verify": {
+            "timeoutSeconds": 300,
+            "overridePolicy": "forbidden"
+          },
+          "gates": {
+            "e2e": {
+              "enabled": true,
+              "suite": "essential",
+              "timeoutSeconds": 300,
+              "overridePolicy": "project_admin"
+            }
+          }
+        }
+      }
+    },
+    "prod": {
+      "isProduction": true,
+      "target": {},
+      "bindings": {
+        "WEB_BUCKET_NAME": {
+          "kind": "cdk-output",
+          "componentKey": "pipeline-e2e-demo-cdk",
+          "outputName": "FrontendBucketName"
+        },
+        "CLOUDFRONT_DISTRIBUTION_ID": {
+          "kind": "cdk-output",
+          "componentKey": "pipeline-e2e-demo-cdk",
+          "outputName": "FrontendDistributionId"
+        }
+      },
+      "secretBindings": {},
+      "deployment": {
+        "requiresApproval": true,
+        "approvalExpiresAfterSeconds": 3600,
+        "timeoutSeconds": 3600,
+        "subStages": {
+          "deploy": {
+            "timeoutSeconds": 1800
+          },
+          "seed": {
+            "timeoutSeconds": 300
+          },
+          "verify": {
+            "timeoutSeconds": 300,
+            "overridePolicy": "forbidden"
+          },
+          "gates": {
+            "e2e": {
+              "enabled": true,
+              "suite": "full",
+              "timeoutSeconds": 300,
+              "overridePolicy": "forbidden"
+            }
+          }
+        }
+      }
+    }
   },
-  "stageApprovals": {
-    "build": {
-      "requiresApproval": false
-    },
-    "package": {
-      "requiresApproval": false
-    },
-    "deploy_beta": {
-      "requiresApproval": true,
-      "reason": "Isolated E2E verifies one approval for the beta deploy barrier."
-    },
-    "verify_beta": {
-      "requiresApproval": false
-    },
-    "deploy_prod": {
-      "requiresApproval": true,
-      "reason": "Isolated E2E verifies one approval for the production-style deploy barrier."
-    },
-    "verify_prod": {
-      "requiresApproval": false
+  "pipeline": {
+    "stageDefaults": {
+      "build": {
+        "requiresApproval": false,
+        "timeoutSeconds": 1200
+      },
+      "package": {
+        "requiresApproval": false,
+        "timeoutSeconds": 1200
+      }
     }
   }
 }
