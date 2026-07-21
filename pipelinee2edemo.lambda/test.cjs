@@ -9,9 +9,10 @@ const markerPath = path.join(
   "e2e-trigger.json",
 );
 const marker = JSON.parse(fs.readFileSync(markerPath, "utf8"));
+const controlledFailureKind = "build-failure";
 
 if (
-  marker.kind === "build-failure" &&
+  marker.kind === controlledFailureKind &&
   process.env.PIPELINE_STAGE_ATTEMPT === "1"
 ) {
   Atomics.wait(
