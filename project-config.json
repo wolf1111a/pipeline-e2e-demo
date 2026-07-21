@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2026-standalone-stage-v1",
   "projectKey": "pipeline-e2e-demo",
-  "displayName": "Pipeline Platform Isolated E2E",
+  "displayName": "Pipeline Platform Standalone E2E",
   "github": {
     "owner": "wolf1111a",
     "repo": "pipeline-e2e-demo",
