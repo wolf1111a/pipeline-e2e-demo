@@ -19,11 +19,12 @@ test("beta reports only the essential test", async () => {
   try {
     const report = await runGate({
       commitId: "a".repeat(40),
+      environmentId: "beta",
       executionId: "attempt-1",
       log: () => {},
       outputPath,
       scenarioPath,
-      stageName: "gate_beta",
+      stageName: "gate_beta_e2e",
     });
     assert.deepEqual(
       report.tests.map((entry) => entry.testId),
@@ -47,6 +48,7 @@ test("prod reports the full manifest", async () => {
   try {
     const report = await runGate({
       commitId: "b".repeat(40),
+      environmentId: "prod",
       executionId: "attempt-2",
       log: () => {},
       outputPath,
@@ -62,7 +64,7 @@ test("prod reports the full manifest", async () => {
           testIds: ["fixture.environment-stage"],
         }],
       },
-      stageName: "gate_prod",
+      stageName: "gate_prod_e2e",
     });
     assert.deepEqual(
       report.tests.map((entry) => entry.testId),
@@ -102,11 +104,12 @@ test("controlled beta failure writes canonical evidence before throwing", async 
     await assert.rejects(
       runGate({
         commitId: "c".repeat(40),
+        environmentId: "beta",
         executionId: "attempt-3",
         log: () => {},
         outputPath,
         scenarioPath,
-        stageName: "gate_beta",
+        stageName: "gate_beta_e2e",
       }),
       /Controlled beta Gate failure/,
     );
@@ -139,17 +142,19 @@ test("reads the runner plan and rejects invalid assignments", async () => {
   try {
     const report = await runGate({
       commitId: "d".repeat(40),
+      environmentId: "prod",
       executionId: "attempt-4",
       log: () => {},
       outputPath,
       planPath,
       scenarioPath,
-      stageName: "gate_prod",
+      stageName: "gate_prod_e2e",
     });
     assert.equal(report.execution.shards[0].mode, "serial");
     await assert.rejects(
       runGate({
         commitId: "e".repeat(40),
+        environmentId: "prod",
         executionId: "attempt-5",
         log: () => {},
         outputPath,
@@ -161,7 +166,7 @@ test("reads the runner plan and rejects invalid assignments", async () => {
             testIds: ["fixture.unknown"],
           }],
         },
-        stageName: "gate_prod",
+        stageName: "gate_prod_e2e",
       }),
       /unknown test/,
     );

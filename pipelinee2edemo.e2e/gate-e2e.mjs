@@ -14,11 +14,13 @@ const testDefinitions = [{
   testId: "fixture.environment-stage",
 }];
 
-function defaultPlan(stageName) {
-  if (stageName !== "gate_beta" && stageName !== "gate_prod") {
-    throw new Error(`Unsupported gate stage: ${stageName || "<unset>"}`);
+function defaultPlan(environmentId) {
+  if (environmentId !== "beta" && environmentId !== "prod") {
+    throw new Error(
+      `Unsupported Gate environment: ${environmentId || "<unset>"}`,
+    );
   }
-  const testIds = stageName === "gate_beta"
+  const testIds = environmentId === "beta"
     ? ["fixture.artifact-identity"]
     : testDefinitions.map((test) => test.testId);
   return {
@@ -74,6 +76,7 @@ async function executeTest(definition, shouldFail) {
 
 export async function runGate({
   commitId = process.env.PIPELINE_COMMIT_ID,
+  environmentId = process.env.PIPELINE_ENVIRONMENT_ID,
   executionId = process.env.PIPELINE_EXECUTION_ID,
   log = console.log,
   outputPath = process.env.PIPELINE_E2E_REPORT_PATH ?? "reports/e2e.json",
@@ -88,12 +91,12 @@ export async function runGate({
   const startedAt = Date.now();
   const setupStartedAt = Date.now();
   const scenario = JSON.parse(await readFile(scenarioPath, "utf8"));
-  const shouldFail = stageName === "gate_beta"
+  const shouldFail = environmentId === "beta"
     && scenario.kind === "fail-beta-gate";
   const resolvedPlan = validatePlan(
     plan ?? (planPath
       ? JSON.parse(await readFile(planPath, "utf8"))
-      : defaultPlan(stageName)),
+      : defaultPlan(environmentId)),
   );
   const setup = {
     durationMs: Date.now() - setupStartedAt,
