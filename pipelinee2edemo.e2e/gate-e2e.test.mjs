@@ -1,18 +1,28 @@
 import assert from "node:assert/strict";
-import { readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import test from "node:test";
 import { runGate } from "./gate-e2e.mjs";
 
-const scenarioPath = new URL("./scenario.json", import.meta.url);
+async function writeScenario(fileName, kind) {
+  const scenarioPath = new URL(`./reports/${fileName}`, import.meta.url);
+  await mkdir(new URL("./reports/", import.meta.url), { recursive: true });
+  await writeFile(
+    scenarioPath,
+    `${JSON.stringify({ kind }, null, 2)}\n`,
+  );
+  return scenarioPath;
+}
 
 test("beta reports only the essential test", async () => {
   const outputPath = "reports/beta.json";
+  const scenarioPath = await writeScenario("beta-scenario.json", "pass");
   try {
     const report = await runGate({
       commitId: "a".repeat(40),
       executionId: "attempt-1",
       log: () => {},
       outputPath,
+      scenarioPath,
       stageName: "gate_beta",
     });
     assert.deepEqual(
@@ -24,18 +34,23 @@ test("beta reports only the essential test", async () => {
     assert.equal(report.cleanup.status, "passed");
     assert.deepEqual(JSON.parse(await readFile(outputPath, "utf8")), report);
   } finally {
-    await rm(outputPath, { force: true });
+    await Promise.all([
+      rm(outputPath, { force: true }),
+      rm(scenarioPath, { force: true }),
+    ]);
   }
 });
 
 test("prod reports the full manifest", async () => {
   const outputPath = "reports/prod.json";
+  const scenarioPath = await writeScenario("prod-scenario.json", "pass");
   try {
     const report = await runGate({
       commitId: "b".repeat(40),
       executionId: "attempt-2",
       log: () => {},
       outputPath,
+      scenarioPath,
       plan: {
         shards: [{
           mode: "parallel",
@@ -70,15 +85,19 @@ test("prod reports the full manifest", async () => {
       }],
     );
   } finally {
-    await rm(outputPath, { force: true });
+    await Promise.all([
+      rm(outputPath, { force: true }),
+      rm(scenarioPath, { force: true }),
+    ]);
   }
 });
 
 test("controlled beta failure writes canonical evidence before throwing", async () => {
   const outputPath = "reports/failure.json";
-  await writeFile(scenarioPath, `${JSON.stringify({
-    kind: "fail-beta-gate",
-  }, null, 2)}\n`);
+  const scenarioPath = await writeScenario(
+    "failure-scenario.json",
+    "fail-beta-gate",
+  );
   try {
     await assert.rejects(
       runGate({
@@ -86,6 +105,7 @@ test("controlled beta failure writes canonical evidence before throwing", async 
         executionId: "attempt-3",
         log: () => {},
         outputPath,
+        scenarioPath,
         stageName: "gate_beta",
       }),
       /Controlled beta Gate failure/,
@@ -97,10 +117,7 @@ test("controlled beta failure writes canonical evidence before throwing", async 
   } finally {
     await Promise.all([
       rm(outputPath, { force: true }),
-      writeFile(
-        scenarioPath,
-        `${JSON.stringify({ kind: "pass" }, null, 2)}\n`,
-      ),
+      rm(scenarioPath, { force: true }),
     ]);
   }
 });
@@ -108,6 +125,7 @@ test("controlled beta failure writes canonical evidence before throwing", async 
 test("reads the runner plan and rejects invalid assignments", async () => {
   const planPath = "reports/plan.json";
   const outputPath = "reports/planned.json";
+  const scenarioPath = await writeScenario("planned-scenario.json", "pass");
   await writeFile(planPath, `${JSON.stringify({
     shards: [{
       mode: "serial",
@@ -125,6 +143,7 @@ test("reads the runner plan and rejects invalid assignments", async () => {
       log: () => {},
       outputPath,
       planPath,
+      scenarioPath,
       stageName: "gate_prod",
     });
     assert.equal(report.execution.shards[0].mode, "serial");
@@ -134,6 +153,7 @@ test("reads the runner plan and rejects invalid assignments", async () => {
         executionId: "attempt-5",
         log: () => {},
         outputPath,
+        scenarioPath,
         plan: {
           shards: [{
             mode: "parallel",
@@ -149,6 +169,7 @@ test("reads the runner plan and rejects invalid assignments", async () => {
     await Promise.all([
       rm(planPath, { force: true }),
       rm(outputPath, { force: true }),
+      rm(scenarioPath, { force: true }),
     ]);
   }
 });
