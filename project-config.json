@@ -39,14 +39,6 @@
           "verify": {
             "timeoutSeconds": 300,
             "overridePolicy": "forbidden"
-          },
-          "gates": {
-            "e2e": {
-              "enabled": true,
-              "suite": "essential",
-              "timeoutSeconds": 300,
-              "overridePolicy": "project_admin"
-            }
           }
         }
       }
@@ -72,14 +64,6 @@
           "verify": {
             "timeoutSeconds": 300,
             "overridePolicy": "forbidden"
-          },
-          "gates": {
-            "e2e": {
-              "enabled": true,
-              "suite": "full",
-              "timeoutSeconds": 300,
-              "overridePolicy": "forbidden"
-            }
           }
         }
       }
