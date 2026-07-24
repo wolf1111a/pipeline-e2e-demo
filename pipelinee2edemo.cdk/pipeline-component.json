@@ -1,9 +1,5 @@
 {
-  "schemaVersion": "2026-standalone-stage-v1",
-  "componentKey": "pipeline-e2e-demo-cdk",
-  "name": "pipeline-e2e-demo-cdk",
-  "type": "cdk_infra",
-  "pluginId": "cdk-node",
+  "schemaVersion": "2026-standalone-stage-v2",
   "pluginVersion": "2.0.0",
   "build": {
     "command": "node e2e-build.cjs && npm ci && npm run synth",
@@ -12,7 +8,12 @@
   "deployment": {
     "deploy": {
       "kind": "cdk-node",
-      "appPath": "."
+      "appPath": ".",
+      "outputs": {
+        "appUrl": "FrontendUrl",
+        "webBucketName": "FrontendBucketName",
+        "cloudFrontDistributionId": "FrontendDistributionId"
+      }
     },
     "seed": {
       "command": "test -s cdk.json"

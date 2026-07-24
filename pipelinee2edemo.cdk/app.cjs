@@ -17,6 +17,12 @@ const account = process.env.CDK_DEFAULT_ACCOUNT || "516703876684";
 const region = process.env.CDK_DEFAULT_REGION || "us-east-1";
 const commitId = process.env.PIPELINE_COMMIT_ID || "local";
 const prefix = `pipeline-e2e-demo-${environmentName}`;
+const lambdaArtifactBucketName =
+  app.node.tryGetContext("lambdaArtifactBucketName") ||
+  `${prefix}-${region}-lambda-artifacts-${account}`;
+const lambdaArtifactKey =
+  app.node.tryGetContext("lambdaArtifactKey") ||
+  `${commitId}/lambda.zip`;
 
 const coreStack = new cdk.Stack(app, "PipelineE2EDemoCore", {
   env: { account, region },
@@ -32,12 +38,12 @@ new cdk.CfnOutput(coreStack, "StateParameterName", {
 const lambdaArtifactBucket = s3.Bucket.fromBucketName(
   coreStack,
   "LambdaArtifactBucket",
-  `${prefix}-${region}-lambda-artifacts-${account}`,
+  lambdaArtifactBucketName,
 );
 const apiFunction = new lambda.Function(coreStack, "ApiFunction", {
   code: lambda.Code.fromBucket(
     lambdaArtifactBucket,
-    `${commitId}/lambda.zip`,
+    lambdaArtifactKey,
   ),
   functionName: `${prefix}-api`,
   handler: "index.handler",
@@ -139,4 +145,7 @@ new cdk.CfnOutput(webStack, "FrontendDistributionId", {
 });
 new cdk.CfnOutput(webStack, "FrontendDomainName", {
   value: distribution.distributionDomainName,
+});
+new cdk.CfnOutput(webStack, "FrontendUrl", {
+  value: `https://${distribution.distributionDomainName}`,
 });

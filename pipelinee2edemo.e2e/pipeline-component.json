@@ -1,9 +1,5 @@
 {
-  "schemaVersion": "2026-standalone-stage-v1",
-  "componentKey": "pipeline-e2e-demo-e2e",
-  "name": "pipeline-e2e-demo-e2e",
-  "type": "e2e",
-  "pluginId": "project-e2e",
+  "schemaVersion": "2026-standalone-stage-v2",
   "pluginVersion": "1.0.0",
   "build": {
     "command": "node --test",

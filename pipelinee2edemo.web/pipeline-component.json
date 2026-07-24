@@ -1,9 +1,5 @@
 {
-  "schemaVersion": "2026-standalone-stage-v1",
-  "componentKey": "pipeline-e2e-demo-web",
-  "name": "pipeline-e2e-demo-web",
-  "type": "frontend_static",
-  "pluginId": "frontend-static",
+  "schemaVersion": "2026-standalone-stage-v2",
   "pluginVersion": "2.0.0",
   "build": {
     "command": "npm ci && npm run build",
@@ -16,10 +12,16 @@
       "preserveObjects": [
         "config.js"
       ],
-      "requiredBindings": [
-        "WEB_BUCKET_NAME",
-        "CLOUDFRONT_DISTRIBUTION_ID"
-      ]
+      "inputs": {
+        "bucketName": {
+          "component": "pipeline-e2e-demo-cdk",
+          "output": "webBucketName"
+        },
+        "cloudFrontDistributionId": {
+          "component": "pipeline-e2e-demo-cdk",
+          "output": "cloudFrontDistributionId"
+        }
+      }
     },
     "verify": {
       "command": "test -s dist/index.html"

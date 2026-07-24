@@ -1,9 +1,5 @@
 {
-  "schemaVersion": "2026-standalone-stage-v1",
-  "componentKey": "pipeline-e2e-demo-lambda",
-  "name": "pipeline-e2e-demo-lambda",
-  "type": "lambda",
-  "pluginId": "aws-lambda",
+  "schemaVersion": "2026-standalone-stage-v2",
   "pluginVersion": "2.0.0",
   "build": {
     "command": "npm test",

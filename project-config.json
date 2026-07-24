@@ -1,10 +1,8 @@
 {
-  "schemaVersion": "2026-standalone-stage-v1",
+  "schemaVersion": "2026-standalone-stage-v2",
   "projectKey": "pipeline-e2e-demo",
   "displayName": "Pipeline Platform Standalone E2E",
-  "github": {
-    "owner": "wolf1111a",
-    "repo": "pipeline-e2e-demo",
+  "source": {
     "defaultBranch": "main"
   },
   "awsDefaults": {
@@ -22,20 +20,11 @@
   "environments": {
     "beta": {
       "isProduction": false,
-      "target": {},
-      "bindings": {
-        "WEB_BUCKET_NAME": {
-          "kind": "cdk-output",
-          "componentKey": "pipeline-e2e-demo-cdk",
-          "outputName": "FrontendBucketName"
-        },
-        "CLOUDFRONT_DISTRIBUTION_ID": {
-          "kind": "cdk-output",
-          "componentKey": "pipeline-e2e-demo-cdk",
-          "outputName": "FrontendDistributionId"
-        }
+      "target": {
+        "permissionTemplates": [
+          "cdk_infra"
+        ]
       },
-      "secretBindings": {},
       "deployment": {
         "requiresApproval": true,
         "approvalExpiresAfterSeconds": 60,
@@ -64,20 +53,11 @@
     },
     "prod": {
       "isProduction": true,
-      "target": {},
-      "bindings": {
-        "WEB_BUCKET_NAME": {
-          "kind": "cdk-output",
-          "componentKey": "pipeline-e2e-demo-cdk",
-          "outputName": "FrontendBucketName"
-        },
-        "CLOUDFRONT_DISTRIBUTION_ID": {
-          "kind": "cdk-output",
-          "componentKey": "pipeline-e2e-demo-cdk",
-          "outputName": "FrontendDistributionId"
-        }
+      "target": {
+        "permissionTemplates": [
+          "cdk_infra"
+        ]
       },
-      "secretBindings": {},
       "deployment": {
         "requiresApproval": true,
         "approvalExpiresAfterSeconds": 3600,
