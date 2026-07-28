@@ -1,4 +1,5 @@
 const cdk = require("aws-cdk-lib");
+const { createHash } = require("node:crypto");
 const cloudfront = require("aws-cdk-lib/aws-cloudfront");
 const origins = require("aws-cdk-lib/aws-cloudfront-origins");
 const iam = require("aws-cdk-lib/aws-iam");
@@ -16,7 +17,18 @@ if (!/^[a-z][a-z0-9-]{0,30}$/.test(environmentName)) {
 const account = process.env.CDK_DEFAULT_ACCOUNT || "516703876684";
 const region = process.env.CDK_DEFAULT_REGION || "us-east-1";
 const commitId = process.env.PIPELINE_COMMIT_ID || "local";
-const prefix = `pipeline-e2e-demo-${environmentName}`;
+const projectKey = process.env.PIPELINE_PROJECT_KEY || "pipeline-e2e-demo";
+if (!/^[a-z0-9][a-z0-9-]{0,62}$/.test(projectKey)) {
+  throw new Error("PIPELINE_PROJECT_KEY must be a normalized project key");
+}
+const resourceNamespace = projectKey === "pipeline-e2e-demo"
+  ? projectKey
+  : `pe2e-${createHash("sha256")
+    .update(projectKey)
+    .digest("hex")
+    .slice(0, 12)}`;
+const prefix = `${resourceNamespace}-${environmentName}`;
+const parameterPrefix = `/${resourceNamespace}/${environmentName}`;
 const lambdaArtifactBucketName =
   app.node.tryGetContext("lambdaArtifactBucketName") ||
   `${prefix}-${region}-lambda-artifacts-${account}`;
@@ -28,12 +40,13 @@ const coreStack = new cdk.Stack(app, "PipelineE2EDemoCore", {
   env: { account, region },
   stackName: `${prefix}-core`,
 });
+cdk.Tags.of(coreStack).add("PipelineProjectKey", projectKey);
 new ssm.StringParameter(coreStack, "StateParameter", {
-  parameterName: `/pipeline-e2e-demo/${environmentName}/state`,
+  parameterName: `${parameterPrefix}/state`,
   stringValue: commitId,
 });
 new cdk.CfnOutput(coreStack, "StateParameterName", {
-  value: `/pipeline-e2e-demo/${environmentName}/state`,
+  value: `${parameterPrefix}/state`,
 });
 const lambdaArtifactBucket = s3.Bucket.fromBucketName(
   coreStack,
@@ -57,6 +70,7 @@ const webStack = new cdk.Stack(app, "PipelineE2EDemoWeb", {
   env: { account, region },
   stackName: `${prefix}-web`,
 });
+cdk.Tags.of(webStack).add("PipelineProjectKey", projectKey);
 webStack.addDependency(coreStack);
 
 const webBucket = new s3.Bucket(webStack, "WebBucket", {
@@ -113,7 +127,7 @@ const deployGate = new cr.AwsCustomResource(webStack, "DeployGate", {
   onCreate: {
     action: "getParameter",
     parameters: {
-      Name: `/pipeline-e2e-demo/${environmentName}/allow-deploy`,
+      Name: `${parameterPrefix}/allow-deploy`,
     },
     physicalResourceId: cr.PhysicalResourceId.of(`${prefix}-${commitId}`),
     service: "SSM",
@@ -121,7 +135,7 @@ const deployGate = new cr.AwsCustomResource(webStack, "DeployGate", {
   onUpdate: {
     action: "getParameter",
     parameters: {
-      Name: `/pipeline-e2e-demo/${environmentName}/allow-deploy`,
+      Name: `${parameterPrefix}/allow-deploy`,
     },
     physicalResourceId: cr.PhysicalResourceId.of(`${prefix}-${commitId}`),
     service: "SSM",
@@ -130,7 +144,7 @@ const deployGate = new cr.AwsCustomResource(webStack, "DeployGate", {
     new iam.PolicyStatement({
       actions: ["ssm:GetParameter"],
       resources: [
-        `arn:${cdk.Aws.PARTITION}:ssm:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:parameter/pipeline-e2e-demo/${environmentName}/allow-deploy`,
+        `arn:${cdk.Aws.PARTITION}:ssm:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:parameter${parameterPrefix}/allow-deploy`,
       ],
     }),
   ]),

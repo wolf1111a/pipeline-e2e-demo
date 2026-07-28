@@ -25,7 +25,12 @@ function packageHoldEnabled() {
       ],
       { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
     );
-    return JSON.parse(raw).shared?.beta?.["e2e-hold-package"] === "true";
+    const projectPath =
+      process.env.PIPELINE_SHARED_CONFIG_PROJECT_PATH || "shared";
+    const config = JSON.parse(raw);
+    const projectConfig = config[projectPath] ??
+      (projectPath === "pipeline-e2e-demo" ? config.shared : undefined);
+    return projectConfig?.beta?.["e2e-hold-package"] === "true";
   } catch {
     return false;
   }
