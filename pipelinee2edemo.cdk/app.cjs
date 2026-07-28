@@ -28,6 +28,7 @@ const resourceNamespace = projectKey === "pipeline-e2e-demo"
     .digest("hex")
     .slice(0, 12)}`;
 const prefix = `${resourceNamespace}-${environmentName}`;
+const stackPrefix = `${projectKey}-${environmentName}`;
 const parameterPrefix = `/${resourceNamespace}/${environmentName}`;
 const lambdaArtifactBucketName =
   app.node.tryGetContext("lambdaArtifactBucketName") ||
@@ -38,7 +39,7 @@ const lambdaArtifactKey =
 
 const coreStack = new cdk.Stack(app, "PipelineE2EDemoCore", {
   env: { account, region },
-  stackName: `${prefix}-core`,
+  stackName: `${stackPrefix}-core`,
 });
 cdk.Tags.of(coreStack).add("PipelineProjectKey", projectKey);
 new ssm.StringParameter(coreStack, "StateParameter", {
@@ -68,7 +69,7 @@ new cdk.CfnOutput(coreStack, "ApiFunctionName", {
 
 const webStack = new cdk.Stack(app, "PipelineE2EDemoWeb", {
   env: { account, region },
-  stackName: `${prefix}-web`,
+  stackName: `${stackPrefix}-web`,
 });
 cdk.Tags.of(webStack).add("PipelineProjectKey", projectKey);
 webStack.addDependency(coreStack);
