@@ -77,7 +77,7 @@ webStack.addDependency(coreStack);
 const webBucket = new s3.Bucket(webStack, "WebBucket", {
   autoDeleteObjects: true,
   blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-  bucketName: `${prefix}-web-${account}`,
+  bucketName: `${stackPrefix}-web-${account}`,
   encryption: s3.BucketEncryption.S3_MANAGED,
   enforceSSL: true,
   removalPolicy: cdk.RemovalPolicy.DESTROY,
