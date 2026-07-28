@@ -3,12 +3,16 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import test from "node:test";
 import { runGate } from "./gate-e2e.mjs";
 
-async function writeScenario(fileName, kind) {
+async function writeScenario(fileName, value) {
   const scenarioPath = new URL(`./reports/${fileName}`, import.meta.url);
   await mkdir(new URL("./reports/", import.meta.url), { recursive: true });
   await writeFile(
     scenarioPath,
-    `${JSON.stringify({ kind }, null, 2)}\n`,
+    `${JSON.stringify(
+      typeof value === "string" ? { kind: value } : value,
+      null,
+      2,
+    )}\n`,
   );
   return scenarioPath;
 }
@@ -117,6 +121,71 @@ test("controlled beta failure writes canonical evidence before throwing", async 
     assert.equal(report.tests[0].status, "failed");
     assert.equal(report.execution.shards[0].status, "failed");
     assert.equal(report.cleanup.status, "passed");
+  } finally {
+    await Promise.all([
+      rm(outputPath, { force: true }),
+      rm(scenarioPath, { force: true }),
+    ]);
+  }
+});
+
+test("applies suite-specific delay and controlled failure", async () => {
+  const outputPath = "reports/delayed-failure.json";
+  const scenarioPath = await writeScenario("delayed-failure-scenario.json", {
+    delayMsBySuite: { smoke: 45_000 },
+    failSuites: ["smoke"],
+    failStageNames: ["gate_beta_smoke"],
+    kind: "gate-policy-exercises",
+  });
+  const delays = [];
+  try {
+    await assert.rejects(
+      runGate({
+        commitId: "f".repeat(40),
+        environmentId: "beta",
+        executionId: "attempt-6",
+        log: () => {},
+        outputPath,
+        plan: {
+          shards: [{
+            mode: "parallel",
+            shardId: "parallel-0",
+            testIds: ["fixture.artifact-identity"],
+          }],
+          suite: "smoke",
+        },
+        scenarioPath,
+        sleep: async (milliseconds) => {
+          delays.push(milliseconds);
+        },
+        stageName: "gate_beta_smoke",
+      }),
+      /Controlled beta Gate failure/,
+    );
+    assert.deepEqual(delays, [45_000]);
+    const report = JSON.parse(await readFile(outputPath, "utf8"));
+    assert.equal(report.tests[0].status, "failed");
+    await assert.rejects(
+      runGate({
+        commitId: "f".repeat(40),
+        environmentId: "beta",
+        executionId: "attempt-7",
+        log: () => {},
+        outputPath,
+        plan: {
+          shards: [{
+            mode: "parallel",
+            shardId: "parallel-0",
+            testIds: ["fixture.artifact-identity"],
+          }],
+          suite: "essential",
+        },
+        scenarioPath,
+        sleep: async () => {},
+        stageName: "gate_beta_smoke",
+      }),
+      /Controlled beta Gate failure/,
+    );
   } finally {
     await Promise.all([
       rm(outputPath, { force: true }),

@@ -83,7 +83,10 @@ export async function runGate({
   plan,
   planPath = process.env.PIPELINE_E2E_PLAN_PATH,
   scenarioPath = path.join(moduleDir, "scenario.json"),
+  sleep = (milliseconds) =>
+    new Promise((resolve) => setTimeout(resolve, milliseconds)),
   stageName = process.env.PIPELINE_STAGE_NAME,
+  suite = process.env.PIPELINE_E2E_SUITE,
 } = {}) {
   if (!executionId || !commitId) {
     throw new Error("PIPELINE_EXECUTION_ID and PIPELINE_COMMIT_ID are required");
@@ -91,13 +94,27 @@ export async function runGate({
   const startedAt = Date.now();
   const setupStartedAt = Date.now();
   const scenario = JSON.parse(await readFile(scenarioPath, "utf8"));
-  const shouldFail = environmentId === "beta"
-    && scenario.kind === "fail-beta-gate";
   const resolvedPlan = validatePlan(
     plan ?? (planPath
       ? JSON.parse(await readFile(planPath, "utf8"))
       : defaultPlan(environmentId)),
   );
+  const resolvedSuite = resolvedPlan.suite ?? suite
+    ?? (environmentId === "beta" ? "essential" : "full");
+  const delayMs = scenario.delayMsBySuite?.[resolvedSuite] ?? 0;
+  if (
+    !Number.isSafeInteger(delayMs)
+    || delayMs < 0
+    || delayMs > 15 * 60_000
+  ) {
+    throw new Error(`Invalid Gate delay for suite ${resolvedSuite}`);
+  }
+  const shouldFail = environmentId === "beta"
+    && (
+      scenario.kind === "fail-beta-gate"
+      || scenario.failSuites?.includes(resolvedSuite)
+      || scenario.failStageNames?.includes(stageName)
+    );
   const setup = {
     durationMs: Date.now() - setupStartedAt,
     status: "passed",
@@ -106,6 +123,9 @@ export async function runGate({
     testDefinitions.map((definition) => [definition.testId, definition]),
   );
   const executionStartedAt = Date.now();
+  if (delayMs > 0) {
+    await sleep(delayMs);
+  }
   const shardResults = await Promise.all(
     resolvedPlan.shards.map(async (shard) => {
       const shardStartedAt = Date.now();
@@ -167,7 +187,7 @@ export async function runGate({
     executionDurationMs: execution.durationMs,
     setupDurationMs: setup.durationMs,
     shardCount: execution.shards.length,
-    suite: resolvedPlan.suite ?? process.env.PIPELINE_E2E_SUITE ?? "unknown",
+    suite: resolvedSuite,
     ...(targetDurationSeconds
       ? {
           targetDurationSeconds,

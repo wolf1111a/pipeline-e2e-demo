@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2026-standalone-stage-v2",
+  "schemaVersion": "2026-standalone-stage-v3",
   "projectKey": "pipeline-e2e-demo",
   "displayName": "Pipeline Platform Standalone E2E",
   "source": {
@@ -42,7 +42,7 @@
           },
           "gates": {
             "e2e": {
-              "enabled": true,
+              "mode": "blocking",
               "suite": "essential",
               "timeoutSeconds": 300,
               "overridePolicy": "project_admin"
@@ -75,7 +75,7 @@
           },
           "gates": {
             "e2e": {
-              "enabled": true,
+              "mode": "blocking",
               "suite": "full",
               "timeoutSeconds": 300,
               "overridePolicy": "forbidden"
