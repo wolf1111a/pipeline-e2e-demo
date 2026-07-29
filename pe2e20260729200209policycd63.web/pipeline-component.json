@@ -14,11 +14,11 @@
       ],
       "inputs": {
         "bucketName": {
-          "component": "pipeline-e2e-demo-cdk",
+          "component": "pe2e-20260729200209-policy-cd63-cdk",
           "output": "webBucketName"
         },
         "cloudFrontDistributionId": {
-          "component": "pipeline-e2e-demo-cdk",
+          "component": "pe2e-20260729200209-policy-cd63-cdk",
           "output": "cloudFrontDistributionId"
         }
       }

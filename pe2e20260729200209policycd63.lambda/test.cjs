@@ -6,7 +6,7 @@ const { handler } = require("./index.js");
 const markerPath = path.join(
   __dirname,
   "..",
-  "pipelinee2edemo.cdk",
+  "pe2e20260729200209policycd63.cdk",
   "e2e-trigger.json",
 );
 const marker = JSON.parse(fs.readFileSync(markerPath, "utf8"));

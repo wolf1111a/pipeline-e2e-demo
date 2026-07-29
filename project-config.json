@@ -1,9 +1,9 @@
 {
   "schemaVersion": "2026-standalone-stage-v3",
-  "projectKey": "pipeline-e2e-demo",
-  "displayName": "Pipeline Platform Standalone E2E",
+  "projectKey": "pe2e-20260729200209-policy-cd63",
+  "displayName": "Pipeline Platform E2E 20260729200209 policy-topology-spine",
   "source": {
-    "defaultBranch": "main"
+    "defaultBranch": "e2e/20260729200209/policy-topology-spine"
   },
   "awsDefaults": {
     "accountId": "516703876684",
@@ -11,7 +11,7 @@
   },
   "sharedConfig": {
     "secretArn": "arn:aws:secretsmanager:us-east-1:516703876684:secret:pipeline-platform-e2e/config",
-    "projectPath": "pipeline-e2e-demo"
+    "projectPath": "pe2e-20260729200209-policy-cd63"
   },
   "environmentOrder": [
     "beta",
