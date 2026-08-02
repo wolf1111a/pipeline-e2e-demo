@@ -27,7 +27,7 @@
       },
       "deployment": {
         "requiresApproval": true,
-        "approvalExpiresAfterSeconds": 60,
+        "approvalExpiresAfterSeconds": 900,
         "timeoutSeconds": 3600,
         "subStages": {
           "deploy": {
