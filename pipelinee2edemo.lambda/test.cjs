@@ -61,5 +61,3 @@ handler().then((result) => {
     process.exitCode = 1;
   }
 });
-
-// Isolated E2E run 20260804202504.
