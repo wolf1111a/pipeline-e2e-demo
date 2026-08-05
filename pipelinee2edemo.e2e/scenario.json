@@ -1,4 +1,5 @@
 {
+  "candidateMarker": "gate-candidate-observe",
   "delayMsBySuite": {
     "essential": 600000,
     "full": 5000
