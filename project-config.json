@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2026-standalone-stage-v3",
   "projectKey": "pipeline-e2e-demo",
-  "displayName": "Pipeline Platform Standalone E2E",
+  "displayName": "Pipeline Platform Standalone E2E 20260804202504",
   "source": {
     "defaultBranch": "main"
   },
