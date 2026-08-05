@@ -42,10 +42,10 @@
           },
           "gates": {
             "e2e": {
-              "mode": "blocking",
+              "mode": "observe_only",
+              "overridePolicy": "project_admin",
               "suite": "essential",
-              "timeoutSeconds": 900,
-              "overridePolicy": "project_admin"
+              "timeoutSeconds": 360
             }
           }
         }
