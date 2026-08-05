@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2026-standalone-stage-v3",
   "projectKey": "pipeline-e2e-demo",
-  "displayName": "Pipeline Platform Standalone E2E 20260804202504",
+  "displayName": "Pipeline Platform Standalone E2E",
   "source": {
     "defaultBranch": "main"
   },
@@ -39,6 +39,14 @@
           "verify": {
             "timeoutSeconds": 300,
             "overridePolicy": "forbidden"
+          },
+          "gates": {
+            "e2e": {
+              "mode": "blocking",
+              "suite": "essential",
+              "timeoutSeconds": 900,
+              "overridePolicy": "project_admin"
+            }
           }
         }
       }
@@ -64,6 +72,14 @@
           "verify": {
             "timeoutSeconds": 300,
             "overridePolicy": "forbidden"
+          },
+          "gates": {
+            "e2e": {
+              "mode": "blocking",
+              "suite": "full",
+              "timeoutSeconds": 300,
+              "overridePolicy": "forbidden"
+            }
           }
         }
       }

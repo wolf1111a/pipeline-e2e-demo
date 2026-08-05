@@ -1,0 +1,7 @@
+{
+  "delayMsBySuite": {
+    "essential": 600000,
+    "full": 5000
+  },
+  "kind": "gate-policy-exercises"
+}
