@@ -1,0 +1,17 @@
+{
+  "name": "pipelinee2edemo-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "pipeline-browser test",
+    "test": "node --test gate-e2e.test.mjs",
+    "e2e:legacy": "node gate-e2e.mjs",
+    "e2e:manifest": "pipeline-browser manifest",
+    "e2e:doctor": "pipeline-browser doctor"
+  },
+  "devDependencies": {
+    "@pipeline-platform/browser": "file:.pipeline-tools/browser.tgz",
+    "@playwright/test": "1.63.0"
+  }
+}

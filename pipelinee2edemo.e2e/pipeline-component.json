@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "2026-standalone-stage-v2",
+  "schemaVersion": "2026-standalone-stage-v3",
   "pluginVersion": "1.0.0",
   "build": {
-    "command": "node --test",
-    "packageCommand": "test -s test-manifest.json"
+    "command": "npm ci && npm test",
+    "packageCommand": "npm ci && npm run e2e:manifest"
   },
   "deployment": {
     "gates": {
@@ -13,18 +13,18 @@
         "testManifestPath": "test-manifest.json",
         "suites": {
           "essential": {
-            "command": "node gate-e2e.mjs",
+            "command": "npm run e2e",
             "includeLabels": [
               "essential"
             ],
             "match": "any",
-            "maxParallelShards": 2,
+            "maxParallelShards": 1,
             "targetDurationSeconds": 60
           },
           "full": {
-            "command": "node gate-e2e.mjs",
+            "command": "npm run e2e",
             "allTests": true,
-            "maxParallelShards": 4,
+            "maxParallelShards": 1,
             "targetDurationSeconds": 120
           }
         },
@@ -32,11 +32,36 @@
           "format": "pipeline-e2e-v1",
           "path": "reports/e2e.json",
           "requireLabelsOnEveryTest": true
+        },
+        "inputs": {
+          "deployment": {
+            "component": "pipelinee2edemo-cdk",
+            "outputs": [
+              "appUrl"
+            ]
+          }
         }
       }
     }
   },
   "test": {
-    "command": "node --test"
+    "command": "npm test"
+  },
+  "browserTests": {
+    "configFile": "playwright.fragment.mjs",
+    "checks": {
+      "browser": {
+        "phase": "gate",
+        "testDir": "tests/browser",
+        "profiles": [
+          "desktop-chromium",
+          "mobile-webkit"
+        ],
+        "target": {
+          "kind": "deployment",
+          "input": "deployment.appUrl"
+        }
+      }
+    }
   }
 }

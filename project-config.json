@@ -42,7 +42,7 @@
           },
           "gates": {
             "e2e": {
-              "mode": "observe_only",
+              "mode": "blocking",
               "overridePolicy": "project_admin",
               "suite": "essential",
               "timeoutSeconds": 360
