@@ -35,7 +35,7 @@
         },
         "inputs": {
           "deployment": {
-            "component": "pipelinee2edemo-cdk",
+            "component": "pipeline-e2e-demo-cdk",
             "outputs": [
               "appUrl"
             ]
